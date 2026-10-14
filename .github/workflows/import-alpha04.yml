@@ -28,6 +28,8 @@ jobs:
           Path('/tmp/hem-chien-alpha04.patch').write_bytes(patch)
           print('Verified patch',sha,len(patch),'bytes')
           PY
+          # Local patch was generated from the alpha03 staging layout, where the workflow was named differently.
+          rm -f .github/workflows/visual-smoke.yml
           git apply --check /tmp/hem-chien-alpha04.patch
           git apply /tmp/hem-chien-alpha04.patch
       - name: Syntax validation
