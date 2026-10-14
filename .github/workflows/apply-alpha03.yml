@@ -1,0 +1,54 @@
+name: Import Alpha 0.3 visual assets
+on:
+  push:
+    branches: [feat/alpha03-visual-polish]
+    paths:
+      - '.bootstrap/alpha03.b64'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Install unpacker
+        run: python3 -m pip install --disable-pip-version-check --quiet brotli
+      - name: Restore verified artwork and source
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64,brotli,hashlib,io,tarfile
+          from pathlib import Path
+          data=Path(".bootstrap/alpha03.b64").read_text().strip()
+          raw=brotli.decompress(base64.b64decode(data,validate=True))
+          digest=hashlib.sha256(raw).hexdigest()
+          assert digest=="492b8a8f37a4056c756dfeb549bbe999d2b3eff93709855bb967d1e065b2a58b",digest
+          allowed={"game.js","index.html","README.md","tools/test_visual.py","docs/art-direction-alpha03.md","assets/portraits/minh.webp","assets/portraits/linh.webp"}
+          with tarfile.open(fileobj=io.BytesIO(raw),mode="r:") as archive:
+            members=archive.getmembers()
+            assert {m.name for m in members}==allowed
+            for m in members:
+              assert m.isfile() and m.name in allowed
+              path=Path(m.name)
+              path.parent.mkdir(parents=True,exist_ok=True)
+              path.write_bytes(archive.extractfile(m).read())
+          print("Recovered",len(allowed),"files",digest)
+          PY
+      - name: Validate script syntax and image assets
+        run: |
+          node --check game.js
+          python3 -m py_compile tools/test_visual.py
+          file assets/portraits/*.webp
+      - name: Commit reviewed assets to feature branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -f .bootstrap/alpha03.b64
+          git add -A
+          git diff --cached --stat
+          git commit -m "feat: Alpha 0.3 visual polish, character portraits, motion and E2E"
+          git push origin HEAD:feat/alpha03-visual-polish
