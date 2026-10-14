@@ -1,0 +1,38 @@
+{
+  "revision": "alpha-0.5-ink-cel",
+  "art_status": "vector-ink-placeholder",
+  "tile_size": [
+    448,
+    360
+  ],
+  "columns": 4,
+  "rows": 12,
+  "anchor_px": [
+    224,
+    326
+  ],
+  "poses": {
+    "idle": 0,
+    "walk": 1,
+    "jump": 2,
+    "crouch": 3,
+    "block": 4,
+    "lp": 5,
+    "hp": 6,
+    "lk": 7,
+    "hk": 8,
+    "special": 9,
+    "super": 10,
+    "hit": 11
+  },
+  "characters": {
+    "minh": {
+      "atlas": "assets/sprites/minh-atlas.png",
+      "reference": "assets/sprites/reference/minh-idle.png"
+    },
+    "linh": {
+      "atlas": "assets/sprites/linh-atlas.png",
+      "reference": "assets/sprites/reference/linh-idle.png"
+    }
+  }
+}

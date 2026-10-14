@@ -86,3 +86,10 @@ python3 tools/export_sprites.py
 ### Regression checks
 
 `node --check game.js` and `python tools/test_alpha04.py` (requires Playwright + Chromium). Tests cover hit-confirm cancel, whiff cancel denial, atlas readiness and training telemetry.
+
+## Alpha 0.5 — Ink-cel Sprite Pass
+
+- Bộ sprite nhân vật được vẽ thêm chi tiết khuôn mặt, mắt, lông mày, tóc, cổ áo, nếp vải, dây giày, bo cổ tay và giáp bảo hộ.
+- Bảo toàn 12 pose × 4 animation tiles (448×360 px/tile), hitbox và logic combat của Alpha 0.4.
+- CI dùng `tools/export_sprites.py` để bake lại atlas từ cùng renderer, và dùng `tools/check_sprite_quality.py` để kiểm tra alpha channel, bounding boxes và chống clipping.
+- **Chưa phải frame-by-frame hand-drawn HD hoàn chỉnh**: đây là ink/cel-shaded procedural art pass nhằm nâng chất lượng sprite placeholder trước khi được thay bằng art do họa sĩ dựng.

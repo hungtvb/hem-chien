@@ -1,0 +1,28 @@
+name: Alpha 0.5 Sprite QA
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  sprite-art:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Pillow
+        run: python -m pip install --quiet Pillow
+      - name: Source syntax
+        run: node --check game.js
+      - name: Quality gate
+        run: python tools/check_sprite_quality.py
+      - name: Ensure sprite master references and manifest
+        run: |
+          test -s assets/sprites/reference/minh-idle.png
+          test -s assets/sprites/reference/linh-idle.png
+          test -s assets/sprites/atlas-manifest.json
