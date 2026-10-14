@@ -29,9 +29,8 @@ jobs:
           print('Verified patch',sha,len(patch),'bytes')
           PY
           # Local patch was generated from the alpha03 staging layout, where the workflow was named differently.
-          rm -f .github/workflows/visual-smoke.yml
-          git apply --check /tmp/hem-chien-alpha04.patch
-          git apply /tmp/hem-chien-alpha04.patch
+          git apply --exclude=.github/workflows/visual-smoke.yml --check /tmp/hem-chien-alpha04.patch
+          git apply --exclude=.github/workflows/visual-smoke.yml /tmp/hem-chien-alpha04.patch
       - name: Syntax validation
         run: |
           node --check game.js
@@ -40,8 +39,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm -r -f .bootstrap
-          git rm -f .github/workflows/import-alpha04.yml
-          git add -A
+          git add game.js index.html README.md tools/test_alpha04.py
           git commit -m "feat: animation timelines, hit confirms and training telemetry"
           git push origin HEAD:feat/alpha04-combat-animation
