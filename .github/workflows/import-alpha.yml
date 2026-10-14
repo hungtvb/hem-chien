@@ -1,0 +1,65 @@
+name: Import Hẻm Chiến Alpha 0.1
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-alpha.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-alpha:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Install build dependencies
+        run: python3 -m pip install --disable-pip-version-check --quiet brotli Pillow
+      - name: Restore verified source archive
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64, brotli, hashlib, io, tarfile
+          from pathlib import Path
+          pieces = sorted(Path(".bootstrap").glob("source.part??"))
+          assert len(pieces) == 6, f"Expected six parts, got {len(pieces)}"
+          encoded = "".join(p.read_text().strip() for p in pieces)
+          compressed = base64.b64decode(encoded, validate=True)
+          raw = brotli.decompress(compressed)
+          digest = hashlib.sha256(raw).hexdigest()
+          expected_sha = "71180e877f448df74bb24e9ea193f61324eafc4fe466704b80e67873f8d49952"
+          assert digest == expected_sha, f"Source checksum mismatch: {digest}"
+          expected = {"README.md", "index.html", "styles.css", "game.js",
+                      "tools/generate_stage.py", "tools/test_browser.py"}
+          with tarfile.open(fileobj=io.BytesIO(raw), mode="r:") as archive:
+              files = {item.name for item in archive.getmembers()}
+              assert files == expected, f"Unexpected archive members: {files ^ expected}"
+              for member in archive.getmembers():
+                  assert member.isfile() and member.name in expected
+                  destination = Path(member.name)
+                  destination.parent.mkdir(parents=True, exist_ok=True)
+                  destination.write_bytes(archive.extractfile(member).read())
+          print("Restored", len(expected), "files; checksum:", digest)
+          PY
+      - name: Generate Saigon stage image
+        run: python3 tools/generate_stage.py
+      - name: Validate JavaScript and Python
+        run: |
+          node --check game.js
+          python3 -m py_compile tools/generate_stage.py tools/test_browser.py
+          test -s assets/saigon-night.png
+          test -s index.html
+          test -s styles.css
+      - name: Commit playable game source
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -r -f .bootstrap
+          git add -A
+          git commit -m "feat: import playable Hẻm Chiến Alpha 0.1 prototype"
+          git push origin HEAD:main
