@@ -14,6 +14,36 @@ const CANCEL_ROUTES={lp:['lp','lk','special'],lk:['hp','special'],hp:['special',
 let showTrainingPanel=true;
 let trainingStats={event:'CHƯA CÓ ĐÒN',damage:0,combo:0,frame:0,attacker:'-'};
 const spriteAtlases={minh:new Image(),linh:new Image()};
+// Alpha 0.6: artist-approved frames are optional overlay atlases. Never replace the
+// vector-derived fallback; incomplete art always falls back pose by pose.
+const artistAtlases={minh:new Image(),linh:new Image()};
+const artistPoseSets={minh:new Set(),linh:new Set()};
+const artistAtlasReady={minh:false,linh:false};
+const artistManifest={status:'loading',error:null};
+fetch('assets/sprites/artist/manifest.json').then(response=>{
+ if(!response.ok)throw new Error(`HTTP ${response.status}`);
+ return response.json();
+}).then(manifest=>{
+ if(manifest.schemaVersion!==1||JSON.stringify(manifest.tileSize)!==JSON.stringify([SPRITE_W,SPRITE_H])||
+    JSON.stringify(manifest.grid)!==JSON.stringify([SPRITE_COLS,SPRITE_ROWS]))throw new Error('incompatible artist atlas manifest');
+ const fighters=['minh','linh'];
+ for(const kind of fighters){
+  const record=manifest.characters?.[kind],poses=record?.poses;
+  if(!Array.isArray(poses)||poses.some(p=>!SPRITE_POSES.includes(p)))throw new Error(`invalid ${kind} poses`);
+  if(poses.length===0)continue;
+  const img=artistAtlases[kind];
+  img.onload=()=>{
+   if(img.naturalWidth===SPRITE_COLS*SPRITE_W&&img.naturalHeight===SPRITE_ROWS*SPRITE_H){
+    artistPoseSets[kind]=new Set(poses);
+    artistAtlasReady[kind]=true;
+   }else artistManifest.error=`${kind}: atlas dimensions invalid`;
+  };
+  img.onerror=()=>{artistManifest.error=`${kind}: artist overlay did not load`;};
+  // File name is hard-coded, never a user-supplied URL.
+  img.src=`assets/sprites/artist/${kind}-overlay.png`;
+ }
+ artistManifest.status='loaded';
+}).catch(error=>{artistManifest.status='fallback';artistManifest.error=String(error);});
 const portraits={minh:new Image(),linh:new Image()};
 for(const kind of ['minh','linh'])portraits[kind].src=`assets/portraits/${kind}.webp`;
 let afterimages=[],superCard=null,reduceMotion=false;
@@ -301,7 +331,9 @@ function animationPhase(p,action=p.action){
  return 3;
 }
 function drawFighter(p,atX=p.x,atY=GROUND+p.y,scale=1,forceAction=null){
- const image=spriteAtlases[p.kind],action=forceAction||p.action;
+ const action=forceAction||p.action,poseName=action==='ko'?'hit':action;
+ const hasArtist=artistAtlasReady[p.kind]&&artistPoseSets[p.kind].has(poseName);
+ const image=hasArtist?artistAtlases[p.kind]:spriteAtlases[p.kind];
  if(preferAtlas&&image.complete&&image.naturalWidth===SPRITE_COLS*SPRITE_W&&image.naturalHeight===SPRITE_ROWS*SPRITE_H){
   const pose=Math.max(0,SPRITE_POSES.indexOf(action==='ko'?'hit':action));const col=animationPhase(p,action);
   ctx.save();ctx.translate(atX,atY);
@@ -310,7 +342,7 @@ function drawFighter(p,atX=p.x,atY=GROUND+p.y,scale=1,forceAction=null){
   const lean=walking?Math.sin((p.actionFrame||frame)*.24)*.025:0;
   const stretch=(action==='special'||action==='super')&&col===2?.055:0;
   ctx.scale((p.face||1)*scale*(1+stretch+lean-breathe*.35),scale*(1-stretch+breathe));
-  ctx.drawImage(image,col*SPRITE_W,pose*SPRITE_H,SPRITE_W,SPRITE_H,-SPRITE_W/2+(action==='super'?48:0),-SPRITE_H+34+(action==='crouch'?54:0),SPRITE_W,SPRITE_H);
+  ctx.drawImage(image,col*SPRITE_W,pose*SPRITE_H,SPRITE_W,SPRITE_H,-SPRITE_W/2+(action==='super'&&!hasArtist?48:0),-SPRITE_H+34+(action==='crouch'&&!hasArtist?54:0),SPRITE_W,SPRITE_H);
   ctx.restore();return;
  }
  drawFighterVector(p,atX,atY,scale,forceAction);
@@ -403,7 +435,7 @@ window.makeSpriteAtlas=function(kind='minh'){
  }
  return c.toDataURL('image/png');
 };
-window.__combatDebug=()=>({spriteRevision:'ink-cel-v0.5',showTrainingPanel,trainingStats,animationTimings:ANIM_TICKS,cancelConfirmed:{p1:p1.confirmed,p2:p2.confirmed},reduceMotion,portraitReady:Object.fromEntries(Object.entries(portraits).map(([k,img])=>[k,img.complete&&img.naturalWidth>0])),afterimages:afterimages.length,boxes:{p1:{hurt:hurtBoxes(p1),attack:attackBoxes(p1)},p2:{hurt:hurtBoxes(p2),attack:attackBoxes(p2)}},showCombatBoxes,preferAtlas,atlasReady:Object.fromEntries(Object.entries(spriteAtlases).map(([k,img])=>[k,img.complete&&img.naturalWidth===SPRITE_COLS*SPRITE_W&&img.naturalHeight===SPRITE_ROWS*SPRITE_H]))});
+window.__combatDebug=()=>({spriteRevision:'artist-overlay-v0.6',artistManifest:{...artistManifest},artistReady:{...artistAtlasReady},artistPoseCoverage:Object.fromEntries(Object.entries(artistPoseSets).map(([kind,poses])=>[kind,[...poses]])),showTrainingPanel,trainingStats,animationTimings:ANIM_TICKS,cancelConfirmed:{p1:p1.confirmed,p2:p2.confirmed},reduceMotion,portraitReady:Object.fromEntries(Object.entries(portraits).map(([k,img])=>[k,img.complete&&img.naturalWidth>0])),afterimages:afterimages.length,boxes:{p1:{hurt:hurtBoxes(p1),attack:attackBoxes(p1)},p2:{hurt:hurtBoxes(p2),attack:attackBoxes(p2)}},showCombatBoxes,preferAtlas,atlasReady:Object.fromEntries(Object.entries(spriteAtlases).map(([k,img])=>[k,img.complete&&img.naturalWidth===SPRITE_COLS*SPRITE_W&&img.naturalHeight===SPRITE_ROWS*SPRITE_H]))});
 window.__gameDebug=()=>({state,round,timer,p1:{x:p1.x,hp:p1.hp,meter:p1.meter,action:p1.action},p2:{x:p2.x,hp:p2.hp,meter:p2.meter,action:p2.action},particles:particles.length,hitFreeze});
 resetMatch();state='menu';$('startOverlay').classList.remove('hidden');requestAnimationFrame(loop);
 })();
