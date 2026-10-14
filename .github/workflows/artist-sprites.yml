@@ -1,0 +1,38 @@
+name: Alpha 0.6 Artist Sprite QA
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - 'art-source/**'
+      - 'tools/build_artist_atlas.py'
+      - 'tools/test_artist_atlas.py'
+      - 'tools/test_artist_runtime.py'
+      - 'assets/sprites/artist/**'
+      - '.github/workflows/artist-sprites.yml'
+permissions:
+  contents: read
+jobs:
+  artist-import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Pillow and Playwright
+        run: |
+          python -m pip install --disable-pip-version-check Pillow playwright
+          python -m playwright install --with-deps chromium
+      - name: Check JavaScript syntax
+        run: node --check game.js
+      - name: Validate art source and build overlays
+        run: python tools/build_artist_atlas.py
+      - name: Verify artist manifest and atlases are reproducible
+        run: git diff --exit-code -- assets/sprites/artist
+      - name: Artist importer regression tests
+        run: python -m unittest discover -s tools -p 'test_artist_atlas.py' -v
+      - name: Runtime fallback and gameplay E2E
+        run: python tools/test_artist_runtime.py
