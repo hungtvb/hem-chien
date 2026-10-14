@@ -47,7 +47,9 @@ jobs:
           print("Restored", len(expected), "files; checksum:", digest)
           PY
       - name: Generate Saigon stage image
-        run: python3 tools/generate_stage.py
+        run: |
+          mkdir -p assets
+          python3 tools/generate_stage.py
       - name: Validate JavaScript and Python
         run: |
           node --check game.js
