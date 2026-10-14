@@ -53,8 +53,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git rm -r -f .bootstrap
-          git rm -f .github/workflows/alpha06-import.yml
-          git add -A
+          # This job has contents:write but no workflows:write; only stage source files.
+          git add -A -- game.js README.md docs tools assets/sprites/artist
           git commit -m 'feat: Alpha 0.6 artist pose import with safe runtime fallback'
           git push origin HEAD:feat/alpha06-artist-pipeline
