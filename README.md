@@ -1,4 +1,4 @@
-# HẺM CHIẾN — Web PC Fighting Prototype Alpha 0.1
+# HẺM CHIẾN — Web PC Fighting Prototype Alpha 0.2 (sprite pipeline preview)
 
 Prototype có thể chơi trên trình duyệt desktop, dùng **HTML5 Canvas + JavaScript thuần** để chạy offline, không phụ thuộc CDN. Đây là phiên bản kiểm chứng combat; hệ thống được thiết kế để có thể chuyển sang Phaser/TypeScript khi chốt vertical slice.
 
@@ -57,3 +57,11 @@ Các atlas `assets/minh-sprite-atlas.png` và `assets/linh-sprite-atlas.png` n�
 2. Thay 12 pose vector bằng sprite hand-drawn HD, trước tiên idle/walk/light/heavy.
 3. Định nghĩa box frame-by-frame qua JSON, motion input, combo cancel, throw và các special riêng của từng nhân vật.
 4. Chạy benchmark atlas VRAM và fix bug gameplay qua playtest.
+
+## Alpha 0.2 — Sprite atlas + collision data
+
+- 12 actions × 4 frames in each atlas (1792×4320 PNG), pre-baked from the **vector placeholder**. Not the final hand-drawn HD art.
+- `python3 tools/export_sprites.py` regenerates the atlases; CI will publish built atlases to `assets/sprites/`.
+- Runtime loads PNG atlas with Canvas vector fallback on missing assets.
+- Hitboxes/hurtboxes are frame-aware world-space rectangles independent of the displayed sprite. Press **H** to debug, **V** to toggle raster/vector rendering.
+- Press `Q` special / `E` super; motion inputs per GDD are a later milestone.

@@ -1,0 +1,47 @@
+name: Build Alpha 0.2 Sprite Atlases
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'game.js'
+      - 'tools/export_sprites.py'
+      - '.github/workflows/build-sprites.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build-sprites:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Install browser
+        run: |
+          python3 -m pip install --disable-pip-version-check playwright
+          python3 -m playwright install --with-deps chromium
+      - name: Bake sprite assets
+        run: python3 tools/export_sprites.py
+      - name: Verify atlases
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct
+          for fighter in ('minh','linh'):
+              file=Path('assets/sprites')/f'{fighter}-atlas.png'
+              data=file.read_bytes()
+              assert data[:8]==b'\x89PNG\r\n\x1a\n'
+              width,height=struct.unpack('>II',data[16:24])
+              assert (width,height)==(1792,4320), (fighter,width,height)
+              assert len(data)>20000
+              print(fighter, len(data), 'bytes', width, height)
+          PY
+      - name: Commit generated atlases
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/sprites/minh-atlas.png assets/sprites/linh-atlas.png
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "assets: bake alpha 0.2 sprite atlas placeholders"
+          git push origin HEAD:main
