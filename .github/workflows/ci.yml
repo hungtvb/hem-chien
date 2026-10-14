@@ -38,6 +38,28 @@ jobs:
             sleep 10
           done
           grep -q 'HẺM CHIẾN' /tmp/hem-chien-live.html
-          for path in game.js styles.css assets/saigon-night.png; do
+          for path in game.js styles.css assets/saigon-night.png assets/sprites/minh-atlas.png assets/sprites/linh-atlas.png; do
             curl -fLsS --connect-timeout 10 --max-time 25 "https://hem-chien.vercel.app/$path" -o /dev/null
           done
+
+      - name: Verify production sprite rendering
+        run: |
+          python3 - <<'PY'
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as playwright:
+              browser=playwright.chromium.launch(headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+              page=browser.new_page(viewport={'width':1440,'height':1080})
+              errors=[]
+              page.on('pageerror',lambda error: errors.append(str(error)))
+              page.goto('https://hem-chien.vercel.app/',wait_until='domcontentloaded',timeout=45000)
+              page.wait_for_function("window.__combatDebug && window.__combatDebug().atlasReady.minh && window.__combatDebug().atlasReady.linh",timeout=30000)
+              page.locator('#modeSelect').select_option('pvp')
+              page.locator('#startBtn').click()
+              page.wait_for_timeout(500)
+              assert page.evaluate("window.__gameDebug().state")=='fight'
+              page.keyboard.press('h')
+              assert page.evaluate("window.__combatDebug().showCombatBoxes")
+              assert not errors, errors
+              print('PRODUCTION SPRITE TEST PASSED',page.evaluate('window.__combatDebug().atlasReady'))
+              browser.close()
+          PY
