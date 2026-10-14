@@ -173,6 +173,10 @@ function drawBackground(){if(bg.complete&&bg.naturalWidth)ctx.drawImage(bg,0,0,W
 function limb(points,width,inner,outer='#0d1323',accent){ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=outer;ctx.lineWidth=width+7;ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);ctx.stroke();ctx.strokeStyle=inner;ctx.lineWidth=width;ctx.stroke();if(accent){ctx.globalAlpha=.35;ctx.strokeStyle=accent;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(points[0][0]-width*.13,points[0][1]-2);for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0]-width*.13,points[i][1]-3);ctx.stroke();}ctx.restore();}
 function poly(pts,fill,stroke='#0d1424',sw=5){ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=sw;ctx.lineJoin='round';ctx.stroke();}}
 function ellipse(x,y,rx,ry,fill,stroke='#111526',width=4){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.stroke();}}
+// Alpha 0.5: deterministic hand-ink-inspired cel line work, shared by gameplay fallback and baked atlases.
+function inkPath(pts,color='#141522',width=2.2){ctx.save();ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(...pts[0]);for(const pt of pts.slice(1))ctx.lineTo(...pt);ctx.stroke();ctx.restore();}
+function inkDot(x,y,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
+function foldLines(list,color='#361d30',weight=1.8){list.forEach(pts=>inkPath(pts,color,weight));}
 function drawFighterVector(p,atX=p.x,atY=GROUND+p.y,scale=1, forceAction=null){const isM=p.kind==='minh',action=forceAction||p.action,tt=(p.actionFrame||frame)/10,move=action==='walk',duck=action==='crouch'||(action==='block'&&p.crouch),block=action==='block',hit=action==='hit'||action==='ko';const isPunch=['lp','hp'].includes(action),isKick=['lk','hk'].includes(action),isSpecial=action==='special',isSuper=action==='super';let mv=MOVE[action],prog=mv?clamp((p.actionFrame-mv.start)/(mv.active+1),0,1):0;const active=mv&&p.actionFrame>=mv.start-1&&p.actionFrame<mv.start+mv.active+3;
  const swinging=isPunch&&active, kicking=isKick&&active,lunging=(isSpecial||isSuper)&&active;
  const skin=isM?'#e6a17e':'#efd0ae',glove=isM?'#e8e6dc':'#255aab',upper=isM?'#ad2434':'#286cbb',upperLight=isM?'#f6544d':'#5ba1f1',pants=isM?'#202637':'#e8eaf3',pantsShade=isM?'#111827':'#adb9d6',edge='#101522';const walkPhase=move?Math.sin((p.actionFrame||frame)*.24)*22:0;const float=move?Math.abs(walkPhase)*.10:Math.sin((p.actionFrame||frame)*.095)*2.3;
@@ -188,6 +192,12 @@ function drawFighterVector(p,atX=p.x,atY=GROUND+p.y,scale=1, forceAction=null){c
  // rear leg
  limb([[-19,hipY],rearKnee,rearFoot],isM?26:23,pantsShade,edge,isM?'#656375':'#f8faff');
  poly([[rearFoot[0]-26,rearFoot[1]-4],[rearFoot[0]+24,rearFoot[1]-4],[rearFoot[0]+32,rearFoot[1]+8],[rearFoot[0]-25,rearFoot[1]+7]],isM?'#6b2531':'#283a68',edge,3);
+ // Cloth topology: back knee, side seam, wrapped cuff and inked shoe sole.
+ inkPath([[-23,hipY+8],[-32+walkPhase*.45,rearKnee[1]+12],[-34-walkPhase*.85,rearFoot[1]-19]],isM?'#62657a':'#fffdfa',2.5);
+ foldLines([[[-30,rearKnee[1]-13],[-45,rearKnee[1]-3],[-38,rearKnee[1]+9]],
+            [[rearFoot[0]-14,rearFoot[1]-17],[rearFoot[0]+11,rearFoot[1]-14]]],isM?'#434456':'#a3b1d5');
+ inkPath([[rearFoot[0]-23,rearFoot[1]+5],[rearFoot[0]+28,rearFoot[1]+5]],'#070c19',3);
+ for(let lace=0;lace<3;lace++)inkPath([[rearFoot[0]-2+lace*7,rearFoot[1]-7],[rearFoot[0]+3+lace*7,rearFoot[1]-2]],'#e1e6f0',1.4);
  // trailing sash / jacket coattail
  if(isM){poly([[-27,torsoY+20],[-64,torsoY+33],[-79,torsoY+79],[-21,torsoY+61]],'#8a2531',edge,4);}else{
   const sw=Math.sin((p.actionFrame||frame)*.07)*12;
@@ -202,9 +212,41 @@ function drawFighterVector(p,atX=p.x,atY=GROUND+p.y,scale=1, forceAction=null){c
  poly([[-31+leaning*.25,topY],[24+leaning*.25,topY-1],[43+leaning*.3,torsoY+37],[22,hipY+9],[-23,hipY+7],[-45,torsoY+35]],upper,edge,6);
  if(isM){poly([[-4,topY+8],[17,topY+8],[17,hipY+1],[-13,hipY]],'#f3e9e2',edge,2);poly([[27,topY+2],[41,torsoY+27],[12,torsoY+34],[13,topY+9]],upperLight,'',0);ctx.strokeStyle='#7b1b2d';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(16,topY+1);ctx.lineTo(10,hipY+5);ctx.stroke();}
  else{poly([[-21,topY+5],[29,topY+2],[12,hipY-6],[-12,hipY-7]],'#f1f2ed',edge,2);poly([[31,topY+1],[40,torsoY+28],[22,torsoY+25]],upperLight,'',0);ctx.strokeStyle='#1e5398';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-22,hipY+1);ctx.lineTo(25,hipY+1);ctx.stroke();}
+ // Tailored combat uniform: collar, zipper, directional shading and threadwork.
+ if(isM){
+  poly([[-31,topY],[-4,topY+7],[-10,torsoY+5],[-23,topY+17]],'#de4d4c',edge,2);
+  poly([[21,topY],[10,topY+10],[20,torsoY+11],[31,topY+16]],'#fd7971',edge,2);
+  inkPath([[0,topY+8],[2,topY+34],[1,hipY+4]],'#bfc7cf',2.2);
+  inkDot(1,hipY-2,2.5,'#f2bd55');
+  inkPath([[-31,torsoY+9],[-37,torsoY+27],[-27,torsoY+41]],'#ee6a60',2.4);
+  foldLines([[[-34,torsoY+35],[-22,torsoY+30],[-17,torsoY+38]],
+            [[29,torsoY+40],[15,torsoY+31]],
+            [[-18,hipY+1],[10,hipY+1]]],'#6b2134',2.1);
+  // Diamond sleeve patch identifies Minh when viewed at gameplay scale.
+  poly([[31,topY+18],[38,topY+21],[35,topY+30],[27,topY+25]],'#ffd0b1','#5c1427',1.4);
+ }else{
+  poly([[-23,topY+4],[-4,topY+17],[5,topY+10],[-8,topY+2]],'#75bdf5',edge,2);
+  poly([[27,topY+4],[13,topY+19],[5,topY+11],[12,topY+2]],'#67bafa',edge,2);
+  inkPath([[-7,topY+16],[-9,hipY-5],[15,hipY-5]],'#d1deef',2);
+  inkPath([[-32,torsoY+23],[-19,torsoY+32],[-30,torsoY+41]],'#123a8a',2);
+  foldLines([[[-16,hipY+8],[12,hipY+7]],[[26,torsoY+41],[32,torsoY+49]],
+             [[-27,topY+25],[-16,topY+33]]],'#20569b',2);
+  // Belt ornament + flowing knot.
+  poly([[-10,hipY-2],[1,hipY-7],[12,hipY-1],[1,hipY+7]],'#f6c47c','#153766',2);
+ }
  // front leg, reaches forward for kicks
  limb([[17,hipY],frontKnee,frontFoot],isM?29:25,pants,edge,isM?'#505869':'#fff');
  poly([[frontFoot[0]-24,frontFoot[1]-5],[frontFoot[0]+26,frontFoot[1]-6],[frontFoot[0]+32,frontFoot[1]+7],[frontFoot[0]-25,frontFoot[1]+8]],isM?'#9a2631':'#284b83',edge,4);
+ // Articulated knee fabric and tailored hems; follow the pose rather than fixed pixels.
+ inkPath([[19,hipY+12],[frontKnee[0]-5,frontKnee[1]+2],[frontFoot[0]-9,frontFoot[1]-15]],isM?'#596074':'#f9ffff',2.6);
+ foldLines([[[frontKnee[0]-16,frontKnee[1]-9],[frontKnee[0]+5,frontKnee[1]-13]],
+            [[frontKnee[0]-10,frontKnee[1]+7],[frontKnee[0]+12,frontKnee[1]+3]],
+            [[frontFoot[0]-16,frontFoot[1]-13],[frontFoot[0]+11,frontFoot[1]-14]]],isM?'#4c5060':'#9baad1',2.1);
+ inkPath([[frontFoot[0]-21,frontFoot[1]+5],[frontFoot[0]+28,frontFoot[1]+5]],'#080e19',3);
+ for(let lace=0;lace<3;lace++)inkPath([[frontFoot[0]-1+lace*7,frontFoot[1]-7],[frontFoot[0]+5+lace*7,frontFoot[1]-3]],isM?'#f1dde1':'#f1f9ff',1.5);
+ // Protective shin/ankle straps and folds.
+ if(!isM){inkPath([[frontFoot[0]-6,frontFoot[1]-17],[frontFoot[0]+16,frontFoot[1]-15]],'#2b72c3',3.3);
+  inkPath([[rearFoot[0]-9,rearFoot[1]-16],[rearFoot[0]+13,rearFoot[1]-14]],'#2b72c3',3.2);}
  // neck and ears
  ctx.save();ctx.translate(leaning*.32,0);poly([[-11,topY-14],[11,topY-14],[15,topY+7],[-10,topY+9]],skin,edge,3);
  // hair ponytail for Linh behind face
@@ -214,6 +256,21 @@ function drawFighterVector(p,atX=p.x,atY=GROUND+p.y,scale=1, forceAction=null){c
  poly([[-25,headY-28],[14,headY-37],[28,headY-20],[15,headY-19],[3,headY-13],[-19,headY-15]],'#101827',edge,2);
  if(isM){poly([[-23,headY-31],[5,headY-42],[2,headY-24],[-9,headY-26],[-16,headY-16]],'#101322','',0);poly([[0,headY-41],[19,headY-32],[10,headY-14]],'#1c222a','',0);}else{poly([[-26,headY-23],[-16,headY-44],[16,headY-39],[28,headY-22],[13,headY-27],[0,headY-16]],'#111a33','',0);}
  ctx.strokeStyle='#172032';ctx.lineWidth=2.4;ctx.beginPath();ctx.moveTo(6,headY-4);ctx.lineTo(17,headY-5);ctx.stroke();ctx.beginPath();ctx.moveTo(18,headY+6);ctx.lineTo(22,headY+12);ctx.stroke();
+ // Facial planes, ears, ink eyebrows, eyes, nose and individual hair locks.
+ ellipse(-21,headY-1,4,8,skin,edge,1.5);
+ poly([[0,headY-7],[18,headY-7],[14,headY-2],[2,headY-2]],'#f6efdc','',0);
+ inkPath([[1,headY-8],[18,headY-9]],'#101324',2.6);
+ inkPath([[3,headY-4],[13,headY-4]],'#0c1c2c',2.2);
+ inkDot(11,headY-4,2.3,'#1b2639');inkDot(12,headY-4.5,.85,'#faffff');
+ inkPath([[18,headY+1],[16,headY+8],[20,headY+10]],'#a86150',1.4);
+ inkPath([[4,headY+16],[11,headY+17],[15,headY+15]],'#994c43',1.7);
+ inkPath([[-14,headY+5],[-9,headY+14]],'#f4c0a0',1.7);
+ // Hair texture is rendered on top of the heavy cel-shadow masses.
+ for(let lock=0;lock<5;lock++){
+  let hx=-21+lock*9;inkPath([[hx,headY-24-(lock%2)*7],[hx+6,headY-30+(lock%3)*2],[hx+10,headY-25]],lock%2?'#41475b':'#626070',1.3);
+ }
+ if(!isM){inkPath([[-12,headY-37],[-1,headY-43],[20,headY-31]],'#7385bd',1.6);
+  inkPath([[-31,headY-37],[-59,headY-44],[-82,headY-63]],'#506397',2.1);}
  ctx.restore();
  // foreground attacking arm
  const shoulder=[27+leaning*.2,torsoY-13];let elbow=[52+leaning,torsoY+10],fist=[40+leaning,torsoY-18];
@@ -223,6 +280,11 @@ function drawFighterVector(p,atX=p.x,atY=GROUND+p.y,scale=1, forceAction=null){c
  if(hit){elbow=[9,torsoY+31];fist=[-23,torsoY+21];}
  limb([shoulder,elbow,fist],isM?23:18,upper,edge,upperLight);
  ellipse(fist[0],fist[1],isM?17:14,isM?16:13,glove,edge,3);
+ // Glove wraps, knuckle construction and sleeve folds attach to striking hand.
+ inkPath([[shoulder[0]+3,shoulder[1]+8],[elbow[0]-7,elbow[1]-5]],isM?'#ff766e':'#92bded',2.3);
+ inkPath([[elbow[0]-9,elbow[1]+7],[elbow[0]+7,elbow[1]+6]],isM?'#711f32':'#214a92',2.1);
+ for(let band=-1;band<=1;band++)inkPath([[fist[0]-6+band*4,fist[1]-9],[fist[0]-2+band*4,fist[1]+9]],isM?'#9696a3':'#adc8f0',1.2);
+ inkPath([[fist[0]+5,fist[1]-11],[fist[0]+12,fist[1]-5]],'#101726',1.5);
  if(isM){ctx.strokeStyle='#b5a69c';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(fist[0]-4,fist[1]-4);ctx.lineTo(fist[0]+7,fist[1]+6);ctx.stroke();}
  if(isSpecial||isSuper){if(active){ctx.save();ctx.shadowColor=isM?'#ff714d':'#58caff';ctx.shadowBlur=isSuper?50:27;ctx.strokeStyle=isM?'#ff8d5d':'#74d9ff';ctx.lineWidth=isSuper?14:9;ctx.beginPath();ctx.ellipse(125,torsoY-18,62,23,-.2,-Math.PI/2,Math.PI/2);ctx.stroke();ctx.restore();}}
  ctx.restore();}
@@ -248,7 +310,7 @@ function drawFighter(p,atX=p.x,atY=GROUND+p.y,scale=1,forceAction=null){
   const lean=walking?Math.sin((p.actionFrame||frame)*.24)*.025:0;
   const stretch=(action==='special'||action==='super')&&col===2?.055:0;
   ctx.scale((p.face||1)*scale*(1+stretch+lean-breathe*.35),scale*(1-stretch+breathe));
-  ctx.drawImage(image,col*SPRITE_W,pose*SPRITE_H,SPRITE_W,SPRITE_H,-SPRITE_W/2,-SPRITE_H+34,SPRITE_W,SPRITE_H);
+  ctx.drawImage(image,col*SPRITE_W,pose*SPRITE_H,SPRITE_W,SPRITE_H,-SPRITE_W/2+(action==='super'?48:0),-SPRITE_H+34+(action==='crouch'?54:0),SPRITE_W,SPRITE_H);
   ctx.restore();return;
  }
  drawFighterVector(p,atX,atY,scale,forceAction);
@@ -335,13 +397,13 @@ window.makeSpriteAtlas=function(kind='minh'){
    const sprite=actor(kind,0);sprite.face=1;sprite.action=pose;
    const mv=MOVE[pose];
    sprite.actionFrame=mv?[Math.max(0,mv.start-3),mv.start,mv.start+Math.ceil(mv.active/2),mv.start+mv.active+3][col]:col*7;
-   ctx=tileCtx;ctx.save();ctx.translate(col*SPRITE_W+SPRITE_W/2,row*SPRITE_H+SPRITE_H-34);
+   ctx=tileCtx;ctx.save();ctx.translate(col*SPRITE_W+SPRITE_W/2-(pose==='super'?48:0),row*SPRITE_H+SPRITE_H-34-(pose==='crouch'?54:0));
    drawFighterVector(sprite,0,0,1,pose);ctx.restore();ctx=outside;
   }
  }
  return c.toDataURL('image/png');
 };
-window.__combatDebug=()=>({showTrainingPanel,trainingStats,animationTimings:ANIM_TICKS,cancelConfirmed:{p1:p1.confirmed,p2:p2.confirmed},reduceMotion,portraitReady:Object.fromEntries(Object.entries(portraits).map(([k,img])=>[k,img.complete&&img.naturalWidth>0])),afterimages:afterimages.length,boxes:{p1:{hurt:hurtBoxes(p1),attack:attackBoxes(p1)},p2:{hurt:hurtBoxes(p2),attack:attackBoxes(p2)}},showCombatBoxes,preferAtlas,atlasReady:Object.fromEntries(Object.entries(spriteAtlases).map(([k,img])=>[k,img.complete&&img.naturalWidth===SPRITE_COLS*SPRITE_W&&img.naturalHeight===SPRITE_ROWS*SPRITE_H]))});
+window.__combatDebug=()=>({spriteRevision:'ink-cel-v0.5',showTrainingPanel,trainingStats,animationTimings:ANIM_TICKS,cancelConfirmed:{p1:p1.confirmed,p2:p2.confirmed},reduceMotion,portraitReady:Object.fromEntries(Object.entries(portraits).map(([k,img])=>[k,img.complete&&img.naturalWidth>0])),afterimages:afterimages.length,boxes:{p1:{hurt:hurtBoxes(p1),attack:attackBoxes(p1)},p2:{hurt:hurtBoxes(p2),attack:attackBoxes(p2)}},showCombatBoxes,preferAtlas,atlasReady:Object.fromEntries(Object.entries(spriteAtlases).map(([k,img])=>[k,img.complete&&img.naturalWidth===SPRITE_COLS*SPRITE_W&&img.naturalHeight===SPRITE_ROWS*SPRITE_H]))});
 window.__gameDebug=()=>({state,round,timer,p1:{x:p1.x,hp:p1.hp,meter:p1.meter,action:p1.action},p2:{x:p2.x,hp:p2.hp,meter:p2.meter,action:p2.action},particles:particles.length,hitFreeze});
 resetMatch();state='menu';$('startOverlay').classList.remove('hidden');requestAnimationFrame(loop);
 })();
