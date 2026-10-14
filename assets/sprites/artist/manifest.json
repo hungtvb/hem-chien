@@ -17,14 +17,22 @@
     "minh": {
       "poses": [
         "idle",
-        "walk"
+        "walk",
+        "lp",
+        "hp",
+        "lk",
+        "hk"
       ],
       "atlas": "assets/sprites/artist/minh-overlay.png"
     },
     "linh": {
       "poses": [
         "idle",
-        "walk"
+        "walk",
+        "lp",
+        "hp",
+        "lk",
+        "hk"
       ],
       "atlas": "assets/sprites/artist/linh-overlay.png"
     }
