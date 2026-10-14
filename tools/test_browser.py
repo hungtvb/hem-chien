@@ -1,6 +1,7 @@
 """Browser smoke test without localhost; environment may restrict browser navigation."""
 from pathlib import Path
 import base64
+import shutil
 from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1]
 html=(ROOT/'index.html').read_text().replace('<link rel="stylesheet" href="styles.css">','').replace('<script src="game.js"></script>','')
@@ -9,7 +10,7 @@ js=(ROOT/'game.js').read_text()
 stage='data:image/png;base64,'+base64.b64encode((ROOT/'assets'/'saigon-night.png').read_bytes()).decode()
 js=js.replace("bg.src='assets/saigon-night.png'", "bg.src='"+stage+"'")
 with sync_playwright() as pl:
-    browser=pl.chromium.launch(headless=True,executable_path='/usr/bin/chromium',args=['--no-sandbox','--disable-dev-shm-usage','--disable-gpu'])
+    browser=pl.chromium.launch(headless=True,executable_path=shutil.which('chromium') or shutil.which('google-chrome') or pl.chromium.executable_path,args=['--no-sandbox','--disable-dev-shm-usage','--disable-gpu'])
     page=browser.new_page(viewport={'width':1440,'height':1090},device_scale_factor=1)
     errors=[]
     page.on('pageerror',lambda e: errors.append(str(e)))

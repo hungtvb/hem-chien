@@ -23,3 +23,21 @@ jobs:
         run: node --check game.js
       - name: Python syntax
         run: python3 -m py_compile tools/generate_stage.py tools/test_browser.py
+      - name: Install Playwright Chromium
+        run: |
+          python3 -m pip install --disable-pip-version-check playwright
+          python3 -m playwright install --with-deps chromium
+      - name: Browser gameplay smoke test
+        run: python3 tools/test_browser.py
+      - name: Check live production URL
+        run: |
+          for try in 1 2 3 4 5 6; do
+            if curl -fLsS --connect-timeout 10 --max-time 25 https://hem-chien.vercel.app/ -o /tmp/hem-chien-live.html && grep -q 'HẺM CHIẾN' /tmp/hem-chien-live.html; then
+              break
+            fi
+            sleep 10
+          done
+          grep -q 'HẺM CHIẾN' /tmp/hem-chien-live.html
+          for path in game.js styles.css assets/saigon-night.png; do
+            curl -fLsS --connect-timeout 10 --max-time 25 "https://hem-chien.vercel.app/$path" -o /dev/null
+          done

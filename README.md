@@ -2,6 +2,12 @@
 
 Prototype có thể chơi trên trình duyệt desktop, dùng **HTML5 Canvas + JavaScript thuần** để chạy offline, không phụ thuộc CDN. Đây là phiên bản kiểm chứng combat; hệ thống được thiết kế để có thể chuyển sang Phaser/TypeScript khi chốt vertical slice.
 
+## Chơi trực tuyến
+
+Bản production: https://hem-chien.vercel.app/
+
+Tự động kiểm thử trong GitHub Actions: JavaScript/Python syntax, Playwright combat smoke test và HTTP smoke test trang production.
+
 ## Chạy
 
 Mở trực tiếp `index.html` trên Chromium, Chrome, Firefox, Edge, hoặc chạy local web server:

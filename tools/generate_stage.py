@@ -146,5 +146,6 @@ for i in range(42):
     alpha=int(3+16*i/42)
     v.rectangle((i*4,i*2,W-i*4,H-i*2),outline=(1,1,8,alpha),width=7)
 im=Image.alpha_composite(im,vig).convert('RGB')
+out.parent.mkdir(parents=True,exist_ok=True)
 im.save(out,quality=95)
 print(out, im.size)
