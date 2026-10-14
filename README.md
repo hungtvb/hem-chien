@@ -93,3 +93,10 @@ python3 tools/export_sprites.py
 - Bảo toàn 12 pose × 4 animation tiles (448×360 px/tile), hitbox và logic combat của Alpha 0.4.
 - CI dùng `tools/export_sprites.py` để bake lại atlas từ cùng renderer, và dùng `tools/check_sprite_quality.py` để kiểm tra alpha channel, bounding boxes và chống clipping.
 - **Chưa phải frame-by-frame hand-drawn HD hoàn chỉnh**: đây là ink/cel-shaded procedural art pass nhằm nâng chất lượng sprite placeholder trước khi được thay bằng art do họa sĩ dựng.
+
+## Alpha 0.6 — Import artwork từng pose (đang chờ hình nhân vật được duyệt)
+
+- Thêm pipeline `tools/build_artist_atlas.py` cho PNG RGBA 448×360, 4 frame/pose, 12 pose/nhân vật.
+- Runtime hỗ trợ overlay artist theo **từng pose**, tự fallback về atlas Alpha 0.5 cho tất cả pose chưa có art. Không thay đổi hitboxes, combo hay camera.
+- Importer không ghi đè hai atlas vector-placeholder đang chạy. Workflow riêng `artist-sprites.yml` kiểm tra định dạng và khả năng tái tạo artifact.
+- **Hiện không có sprite hand-drawn mới được duyệt trong production** (0/24 pose). Chi tiết đầu vào và nghiệm thu tại `docs/alpha06-artist-import.md`.

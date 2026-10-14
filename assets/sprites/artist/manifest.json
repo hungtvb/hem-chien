@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "artStatus": "technical-only-human-art-approval-required",
+  "tileSize": [
+    448,
+    360
+  ],
+  "grid": [
+    4,
+    12
+  ],
+  "anchorPx": [
+    224,
+    326
+  ],
+  "characters": {
+    "minh": {
+      "poses": [],
+      "atlas": null
+    },
+    "linh": {
+      "poses": [],
+      "atlas": null
+    }
+  }
+}
