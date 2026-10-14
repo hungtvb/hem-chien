@@ -1,12 +1,6 @@
-# HẺM CHIẾN — Web PC Fighting Prototype Alpha 0.2 (sprite pipeline preview)
+# HẺM CHIẾN — Web PC Fighting Prototype Alpha 0.3 (visual polish pass) (sprite pipeline preview)
 
 Prototype có thể chơi trên trình duyệt desktop, dùng **HTML5 Canvas + JavaScript thuần** để chạy offline, không phụ thuộc CDN. Đây là phiên bản kiểm chứng combat; hệ thống được thiết kế để có thể chuyển sang Phaser/TypeScript khi chốt vertical slice.
-
-## Chơi trực tuyến
-
-Bản production: https://hem-chien.vercel.app/
-
-Tự động kiểm thử trong GitHub Actions: JavaScript/Python syntax, Playwright combat smoke test và HTTP smoke test trang production.
 
 ## Chạy
 
@@ -58,10 +52,25 @@ Các atlas `assets/minh-sprite-atlas.png` và `assets/linh-sprite-atlas.png` n�
 3. Định nghĩa box frame-by-frame qua JSON, motion input, combo cancel, throw và các special riêng của từng nhân vật.
 4. Chạy benchmark atlas VRAM và fix bug gameplay qua playtest.
 
-## Alpha 0.2 — Sprite atlas + collision data
+## Alpha 0.3 (visual polish pass) — Sprite animation pipeline (interim)
 
-- 12 actions × 4 frames in each atlas (1792×4320 PNG), pre-baked from the **vector placeholder**. Not the final hand-drawn HD art.
-- `python3 tools/export_sprites.py` regenerates the atlases; CI will publish built atlases to `assets/sprites/`.
-- Runtime loads PNG atlas with Canvas vector fallback on missing assets.
-- Hitboxes/hurtboxes are frame-aware world-space rectangles independent of the displayed sprite. Press **H** to debug, **V** to toggle raster/vector rendering.
-- Press `Q` special / `E` super; motion inputs per GDD are a later milestone.
+- 12 states × 4 keyed frames, sprite atlas pre-baked 1792×4320 RGBA PNG for Minh and Linh.
+- Baked with `python tools/export_sprites.py`; runtime loads `assets/sprites/{minh,linh}-atlas.png`.
+- Hitboxes and hurtboxes are independent world-space rectangles; press **H** to inspect collision; press **V** to compare vector renderer vs sprite atlas.
+- Fallback vector animation remains active if the PNG atlas is missing.
+- Sprite atlas currently originates from the **vector placeholder**, not final hand-drawn HD art. Artists can replace atlases without changing the combat system.
+
+### Regenerate art assets
+```bash
+python3 -m pip install playwright
+python3 -m playwright install chromium
+python3 tools/export_sprites.py
+```
+
+## Alpha 0.3 — visual polish (WIP)
+
+- Added illustrated character portraits used by HUD and Super cut-in; derived from the project's internal concept board.
+- Added action-specific afterimage trails, idle breath, walk leaning, contact-frame squash/stretch; visuals do not affect hitboxes or frame data.
+- `M`: toggle reduced-motion presentation; `H` hitbox debug; `V` atlas/vector switch.
+- Both character atlases remain 48 pose-frames of the Alpha 0.2 **vector placeholder**. This milestone does **not** claim production-ready hand-drawn HD animation.
+- No changes to simulation tick, hit/stun balance, collision, or AI.
