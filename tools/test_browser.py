@@ -48,6 +48,16 @@ with sync_playwright() as pl:
     after_guard=page.evaluate('window.__gameDebug().p2.hp')
     print('BLOCK TEST',guard_hp,'->',after_guard)
     assert after_guard==guard_hp, 'Blocking mid special should avoid HP damage'
+    # Collision rectangles are exposed for training/debug and must be coherent.
+    collision=page.evaluate('window.__combatDebug()')
+    assert len(collision['boxes']['p1']['hurt'])>0
+    assert len(collision['boxes']['p2']['hurt'])>0
+    page.keyboard.press('h')
+    assert page.evaluate('window.__combatDebug().showCombatBoxes')
+    page.keyboard.press('v')
+    assert not page.evaluate('window.__combatDebug().preferAtlas')
+    page.keyboard.press('v')
+    assert page.evaluate('window.__combatDebug().preferAtlas')
     # Atlas generation must work and have usable, nonzero byte sizes.
     for kind in ['minh','linh']:
         data=page.evaluate('(kind)=>window.makeSpriteAtlas(kind)',kind)
