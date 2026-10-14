@@ -1,4 +1,4 @@
-# HẺM CHIẾN — Web PC Fighting Prototype Alpha 0.3 (visual polish pass) (sprite pipeline preview)
+# HẺM CHIẾN — Web PC Fighting Prototype Alpha 0.4 (combat + animation foundation)
 
 Prototype có thể chơi trên trình duyệt desktop, dùng **HTML5 Canvas + JavaScript thuần** để chạy offline, không phụ thuộc CDN. Đây là phiên bản kiểm chứng combat; hệ thống được thiết kế để có thể chuyển sang Phaser/TypeScript khi chốt vertical slice.
 
@@ -74,3 +74,15 @@ python3 tools/export_sprites.py
 - `M`: toggle reduced-motion presentation; `H` hitbox debug; `V` atlas/vector switch.
 - Both character atlases remain 48 pose-frames of the Alpha 0.2 **vector placeholder**. This milestone does **not** claim production-ready hand-drawn HD animation.
 - No changes to simulation tick, hit/stun balance, collision, or AI.
+
+## Alpha 0.4 — Animation timelines / hit-confirm cancel / Training telemetry
+
+- Timeline durations for idle, walk, jump, crouch, block and hit are defined as **simulation-tick counts**, independent from the sprite atlas. A 4-frame illustration can now hold frames for different durations.
+- Hit/block-confirmed cancel routing: `LP→LP/LK/Special`, `LK→HP/Special`, `HP/HK→Special/Super` during a limited cancel window. Whiffed attacks cannot cancel. Super still costs 300 Momentum.
+- Training Mode now displays last damage/combo, frame counter, current action, hitstun and whether a cancel is available. Toggle the panel with **T**.
+- KO visually selects the knockdown/hit pose rather than the default idle.
+- **Important**: Current atlases remain vector-derived placeholders. Newly generated concept boards are not sprite-ready (not isolated, high-resolution transparent character frames), so they were not substituted into gameplay.
+
+### Regression checks
+
+`node --check game.js` and `python tools/test_alpha04.py` (requires Playwright + Chromium). Tests cover hit-confirm cancel, whiff cancel denial, atlas readiness and training telemetry.

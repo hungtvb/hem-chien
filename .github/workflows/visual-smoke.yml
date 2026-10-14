@@ -1,4 +1,4 @@
-name: Alpha 0.3 Visual Smoke
+name: Alpha 0.4 Combat & Visual Smoke
 on:
   push:
     branches: [main]
@@ -28,3 +28,5 @@ jobs:
           test -s assets/sprites/linh-atlas.png
       - name: Playwright visual and combat smoke test
         run: python tools/test_visual.py
+      - name: Combo cancel and animation E2E
+        run: python tools/test_alpha04.py
