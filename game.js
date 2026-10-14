@@ -342,7 +342,7 @@ function drawFighter(p,atX=p.x,atY=GROUND+p.y,scale=1,forceAction=null){
   const lean=walking?Math.sin((p.actionFrame||frame)*.24)*.025:0;
   const stretch=(action==='special'||action==='super')&&col===2?.055:0;
   ctx.scale((p.face||1)*scale*(1+stretch+lean-breathe*.35),scale*(1-stretch+breathe));
-  ctx.drawImage(image,col*SPRITE_W,pose*SPRITE_H,SPRITE_W,SPRITE_H,-SPRITE_W/2+(action==='super'?48:0),-SPRITE_H+34+(action==='crouch'?54:0),SPRITE_W,SPRITE_H);
+  ctx.drawImage(image,col*SPRITE_W,pose*SPRITE_H,SPRITE_W,SPRITE_H,-SPRITE_W/2+(action==='super'&&!hasArtist?48:0),-SPRITE_H+34+(action==='crouch'&&!hasArtist?54:0),SPRITE_W,SPRITE_H);
   ctx.restore();return;
  }
  drawFighterVector(p,atX,atY,scale,forceAction);
