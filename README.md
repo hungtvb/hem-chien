@@ -100,3 +100,7 @@ python3 tools/export_sprites.py
 - Runtime hỗ trợ overlay artist theo **từng pose**, tự fallback về atlas Alpha 0.5 cho tất cả pose chưa có art. Không thay đổi hitboxes, combo hay camera.
 - Importer không ghi đè hai atlas vector-placeholder đang chạy. Workflow riêng `artist-sprites.yml` kiểm tra định dạng và khả năng tái tạo artifact.
 - **Hiện không có sprite hand-drawn mới được duyệt trong production** (0/24 pose). Chi tiết đầu vào và nghiệm thu tại `docs/alpha06-artist-import.md`.
+
+## Alpha 0.8 — Combat sprites
+
+Bổ sung 32 frame LP/HP/LK/HK bằng biến dạng cutout từ master Alpha 0.7; mỗi nhân vật có 6/12 pose overlay (idle, walk, lp, hp, lk, hk). Build lại với `python tools/build_attack_frames.py` và `python tools/build_artist_atlas.py`. Chi tiết và giới hạn artwork: [docs/alpha08-combat-sprites.md](docs/alpha08-combat-sprites.md). Đây chưa phải frame hand-drawn riêng lẻ.
