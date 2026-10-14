@@ -44,10 +44,13 @@ with sync_playwright() as pl:
     page.wait_for_timeout(750)
     # P2 faces left; moving right holds BACK to block a mid special.
     guard_hp=page.evaluate('window.__gameDebug().p2.hp')
-    page.keyboard.down('ArrowRight');page.keyboard.press('q');page.wait_for_timeout(480);page.keyboard.up('ArrowRight')
+    page.keyboard.down('ArrowRight');page.wait_for_timeout(220)
+    assert page.evaluate('window.__gameDebug().p2.action')=='block', 'P2 must enter guard before the special starts'
+    page.keyboard.press('q');page.wait_for_timeout(480);page.keyboard.up('ArrowRight')
     after_guard=page.evaluate('window.__gameDebug().p2.hp')
     print('BLOCK TEST',guard_hp,'->',after_guard)
     assert after_guard==guard_hp, 'Blocking mid special should avoid HP damage'
+    assert page.evaluate('window.__combatDebug().trainingStats.event')=='GUARD', 'Blocked special must actually connect (not whiff)'
     # Collision rectangles are exposed for training/debug and must be coherent.
     collision=page.evaluate('window.__combatDebug()')
     assert len(collision['boxes']['p1']['hurt'])>0
