@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HẺM CHIẾN — 2D Fighting Prototype</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <header class="masthead">
+    <div class="brand"><span class="mark">HẺM <b>CHIẾN</b></span><span class="tagline">2D FIGHTING · SAIGON AFTER DARK</span></div>
+    <div class="topright"><span class="demo-pill">PLAYABLE PROTOTYPE · ALPHA 0.1</span><button id="soundBtn" class="btn small" type="button">♪ BẬT ÂM</button></div>
+  </header>
+  <main>
+    <section class="game-shell" aria-label="Trò chơi đối kháng Hẻm Chiến">
+      <canvas id="game" width="1280" height="720" aria-label="Game 2D, dùng bàn phím để điều khiển">Trình duyệt không hỗ trợ Canvas.</canvas>
+      <div id="startOverlay" class="overlay"><div class="inner-overlay"><p class="eyebrow">ĐƯỜNG PHỐ LÀ ĐẤU TRƯỜNG</p><h1>HẺM <em>CHIẾN</em></h1><p class="subhead">MINH <span>VS</span> LINH</p><p class="intro">Đấu tay đôi giữa lòng Sài Gòn về đêm. Kiểm soát khoảng cách, tung combo và hạ gục đối thủ trước khi hết giờ.</p><div class="menu-actions"><button class="cta" id="startBtn">VÀO TRẬN <span>→</span></button><button class="btn" id="trainingBtn">CHẾ ĐỘ LUYỆN TẬP</button></div><div class="hint">Nhấn <kbd>Enter</kbd> để bắt đầu · Chơi bằng bàn phím trên Web PC</div></div></div>
+      <div id="pauseOverlay" class="overlay hidden"><div class="inner-overlay"><p class="eyebrow">TẠM DỪNG</p><h2>PAUSE</h2><button id="resumeBtn" class="cta">TIẾP TỤC <span>→</span></button><p class="hint">Nhấn P để tiếp tục</p></div></div>
+      <div id="resultOverlay" class="overlay hidden"><div class="inner-overlay"><p class="eyebrow">KẾT QUẢ TRẬN ĐẤU</p><h2 id="winnerText">MINH THẮNG!</h2><p id="winnerDetail" class="intro"></p><div class="menu-actions"><button id="rematchBtn" class="cta">TÁI ĐẤU <span>↻</span></button><button id="menuBtn" class="btn">MENU CHÍNH</button></div></div></div>
+    </section>
+    <section class="control-row">
+      <div class="control-block"><div class="control-title">NGƯỜI CHƠI 1 <span>MINH / THIẾT QUYỀN</span></div><div class="keys"><span><kbd>A</kbd><kbd>D</kbd> Di chuyển</span><span><kbd>W</kbd> Nhảy</span><span><kbd>S</kbd> Ngồi</span><span><kbd>J</kbd><kbd>K</kbd> Đấm</span><span><kbd>U</kbd><kbd>I</kbd> Đá</span><span><kbd>Q</kbd> Special</span><span><kbd>E</kbd> Super</span></div></div>
+      <div class="control-block right-block"><div class="control-title">TÙY CHỌN TRẬN ĐẤU</div><div class="settings"><label for="modeSelect">Đối thủ</label><select id="modeSelect"><option value="ai">LINH (AI)</option><option value="pvp">2 người cùng bàn phím</option></select><label for="difficultySelect">AI</label><select id="difficultySelect"><option value="easy">Dễ</option><option value="normal" selected>Vừa</option><option value="hard">Khó</option></select><button class="btn small" id="restartBtn">↻ CHƠI LẠI</button></div></div>
+    </section>
+    <section class="info-grid">
+      <article class="info-card"><span class="eyebrow">CHIÊU THỨC</span><h3>COMBAT BASICS</h3><p>Giữ hướng lùi để đỡ đòn, giữ lùi + S để đỡ đòn thấp. Đấm nhẹ nhanh, đòn nặng chậm và gây sát thương cao. Q tung special; E dùng Super khi Momentum đủ 300.</p></article>
+      <article class="info-card"><span class="eyebrow">CƠ CHẾ</span><h3>60-TICK COMBAT</h3><p>Hitbox/hurtbox, startup/active/recovery, blockstun, hitstun, knockback, hitstop, thanh máu, Momentum, thời gian và thắng 2 hiệp. Nhấn P để tạm dừng.</p></article>
+      <article class="info-card"><span class="eyebrow">THỬ NGHIỆM</span><h3>ALPHA VISUALS</h3><p>Nhân vật hiện là vector sprite thử nghiệm với khớp chuyển động, chưa phải frame vẽ tay cuối cùng. Phần animation và đồ họa sẽ được thay bằng sprite HD sau khi nghiệm thu gameplay.</p></article>
+    </section>
+  </main>
+  <footer>HẺM CHIẾN · Prototype game gốc · Minh / Linh · Stage 01: Phố Đêm Sài Gòn</footer>
+</div>
+<script src="game.js"></script>
+</body></html>
