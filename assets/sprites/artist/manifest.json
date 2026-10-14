@@ -15,12 +15,18 @@
   ],
   "characters": {
     "minh": {
-      "poses": [],
-      "atlas": null
+      "poses": [
+        "idle",
+        "walk"
+      ],
+      "atlas": "assets/sprites/artist/minh-overlay.png"
     },
     "linh": {
-      "poses": [],
-      "atlas": null
+      "poses": [
+        "idle",
+        "walk"
+      ],
+      "atlas": "assets/sprites/artist/linh-overlay.png"
     }
   }
 }
