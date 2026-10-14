@@ -1,0 +1,30 @@
+name: Alpha 0.3 Visual Smoke
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  visual-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser dependencies
+        run: |
+          python -m pip install --disable-pip-version-check playwright
+          python -m playwright install --with-deps chromium
+      - name: Validate source and art assets
+        run: |
+          node --check game.js
+          test -s assets/portraits/minh.webp
+          test -s assets/portraits/linh.webp
+          test -s assets/sprites/minh-atlas.png
+          test -s assets/sprites/linh-atlas.png
+      - name: Playwright visual and combat smoke test
+        run: python tools/test_visual.py
