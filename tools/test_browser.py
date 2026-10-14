@@ -46,7 +46,11 @@ with sync_playwright() as pl:
     guard_hp=page.evaluate('window.__gameDebug().p2.hp')
     page.keyboard.down('ArrowRight');page.wait_for_timeout(220)
     assert page.evaluate('window.__gameDebug().p2.action')=='block', 'P2 must enter guard before the special starts'
-    page.keyboard.press('q');page.wait_for_timeout(480);page.keyboard.up('ArrowRight')
+    page.keyboard.press('q')
+    # Keep blocking until the actual collision is processed; a hardcoded 480ms
+    # wait is unreliable on busy CI runners and can release guard too soon.
+    page.wait_for_function("() => window.__combatDebug().trainingStats.event === 'GUARD'", timeout=8000)
+    page.keyboard.up('ArrowRight')
     after_guard=page.evaluate('window.__gameDebug().p2.hp')
     print('BLOCK TEST',guard_hp,'->',after_guard)
     assert after_guard==guard_hp, 'Blocking mid special should avoid HP damage'
