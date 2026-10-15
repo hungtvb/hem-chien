@@ -65,7 +65,7 @@ jobs:
           rm -f alpha10-gameplay-preview.png
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm -f .bootstrap/alpha10.txt .github/workflows/import-alpha10.yml
-          git add -A
+          git rm -f .bootstrap/alpha10.txt
+          git add README.md art-source assets/sprites/artist docs tools
           git commit -m "feat: Alpha 1.0 Special/Super keyframes and 24-of-24 sprite coverage"
           git push origin HEAD:feat/alpha10-special-super
