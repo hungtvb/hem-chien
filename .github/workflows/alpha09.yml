@@ -4,6 +4,7 @@ on:
     branches: [main, feat/alpha09-defense-movement]
     paths:
       - 'tools/build_defense_frames.py'
+      - 'tools/check_art_repro.py'
       - 'tools/test_alpha09.py'
       - 'art-source/**'
       - 'assets/sprites/artist/**'
@@ -40,7 +41,7 @@ jobs:
           node --check game.js
       - name: Ensure generated assets are reproducible on PR and main
         if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
-        run: git diff --exit-code -- art-source assets/sprites/artist
+        run: python tools/check_art_repro.py
       - name: Publish generated alpha 0.9 art onto feature branch
         if: github.event_name == 'push' && github.ref == 'refs/heads/feat/alpha09-defense-movement'
         run: |
