@@ -1,0 +1,42 @@
+name: Alpha 1.1 Animation and Performance
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'game.js'
+      - 'tools/test_alpha11.py'
+      - '.github/workflows/alpha11.yml'
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  animation-perf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: |
+          python -m pip install --disable-pip-version-check Pillow playwright
+          python -m playwright install --with-deps chromium
+      - name: Syntax checks
+        run: |
+          node --check game.js
+          python -m py_compile tools/test_alpha11.py
+      - name: Animation transition and profiler E2E
+        run: python tools/test_alpha11.py
+      - name: Alpha 1.0 combat regression
+        run: python tools/test_alpha10.py
+      - name: Archive performance report and screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: alpha11-chromium-metrics
+          path: |
+            alpha11-benchmark.json
+            alpha11-gameplay-preview.png
+          if-no-files-found: ignore

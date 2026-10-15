@@ -123,3 +123,12 @@ Production: https://hem-chien.vercel.app/
 - Reproduce with `python tools/build_special_frames.py && python tools/build_artist_atlas.py`.
 - E2E: `python tools/test_alpha10.py`; see `docs/alpha10-special-super.md`.
 - Art status: **concept-derived cutout animation; NOT independently hand-drawn HD**.
+
+## Alpha 1.1 — Animation Polish & Browser Performance
+
+- Thêm chuyển tiếp hình ảnh 5 simulation ticks khi trở về `idle/walk/block/crouch`. Các trạng thái attack, hit, KO vẫn hiển thị ngay, không thay đổi hitbox hoặc recovery.
+- Chuyển tiếp giảm alpha của pose cũ qua thời gian; phím `M` (reduced motion) sẽ tắt ghost blending.
+- Phím **B** bật/tắt bảng profiler gồm recent FPS, draw-time p95 và frame interval p95.
+- `window.__perfDebug()` cung cấp rolling metrics (180 frame gần nhất), slow frame count và animation transition state để debug.
+- E2E: `python tools/test_alpha11.py` kiểm tra visual transition, toggle B/M, tải asset, JavaScript errors. GitHub Actions lưu `alpha11-benchmark.json` và preview.
+- **Giới hạn:** đây là polish kỹ thuật; sprite hiện vẫn tạo từ concept cutout/deform, chưa được nghiệm thu hand-drawn HD hoàn chỉnh. FPS đo trên CI chỉ để so sánh, không phải bảo đảm 60 FPS trên mọi phần cứng.
