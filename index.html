@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HẺM CHIẾN — 2D Fighting Prototype</title>
+<title>HẺM CHIẾN — Đối kháng đường phố</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -14,7 +14,38 @@
   <main>
     <section class="game-shell" aria-label="Trò chơi đối kháng Hẻm Chiến">
       <canvas id="game" width="1280" height="720" aria-label="Game 2D, dùng bàn phím để điều khiển">Trình duyệt không hỗ trợ Canvas.</canvas>
-      <div id="startOverlay" class="overlay"><div class="inner-overlay"><p class="eyebrow">ĐƯỜNG PHỐ LÀ ĐẤU TRƯỜNG</p><h1>HẺM <em>CHIẾN</em></h1><p class="subhead">MINH <span>VS</span> LINH</p><p class="intro">Đấu tay đôi giữa lòng Sài Gòn về đêm. Kiểm soát khoảng cách, tung combo và hạ gục đối thủ trước khi hết giờ.</p><div class="asset-status" role="status" aria-live="polite"><span id="assetStatus">Đang tải nhân vật mới...</span><button type="button" id="assetRetry" class="btn small" hidden>Tải lại</button></div><div class="menu-actions"><button class="cta" id="startBtn">VÀO TRẬN <span>→</span></button><button class="btn" id="trainingBtn">CHẾ ĐỘ LUYỆN TẬP</button></div><div class="hint">Nhấn <kbd>Enter</kbd> để bắt đầu · Chơi bằng bàn phím trên Web PC</div></div></div>
+      <div id="startOverlay" class="overlay menu-title-screen">
+        <div class="hero-frame">
+          <div class="hero-topbar">
+            <div class="hero-edition"><span class="edition-square"></span> ORIGINAL 2D FIGHTING GAME <span class="edition-line"></span> SAIGON · NIGHT CIRCUIT</div>
+            <div class="hero-build">EARLY ACCESS <span>ALPHA 1.1</span></div>
+          </div>
+          <div class="hero-main">
+            <div class="hero-copy">
+              <div class="hero-kicker"><i></i> SÀI GÒN, SAU NỬA ĐÊM</div>
+              <h1 class="hero-logo"><span>HẺM</span><em>CHIẾN<span class="logo-period">.</span></em></h1>
+              <div class="hero-strike"></div>
+              <h2 class="hero-slogan">KHÔNG CÓ ĐƯỜNG LÙI.</h2>
+              <p class="hero-description">Hai võ sĩ. Một đấu trường. Bản lĩnh quyết định tất cả.</p>
+              <div class="hero-actions">
+                <button class="cta hero-start" id="startBtn"><span class="play-glyph" aria-hidden="true">▶</span><span>BẮT ĐẦU TRẬN ĐẤU <small>VERSUS · 1 VS 1</small></span><strong aria-hidden="true">↗</strong></button>
+                <button class="btn hero-training" id="trainingBtn"><span class="training-glyph" aria-hidden="true">◎</span> PHÒNG LUYỆN TẬP <span aria-hidden="true">→</span></button>
+              </div>
+              <div class="asset-status hero-asset-status" role="status" aria-live="polite"><span id="assetStatus">Đang tải nhân vật...</span><button type="button" id="assetRetry" class="btn small" hidden>TẢI LẠI</button></div>
+            </div>
+            <div class="hero-showcase" aria-hidden="true">
+              <span class="fighter-name fighter-name-minh">MINH <small>THIẾT QUYỀN</small></span>
+              <span class="hero-versus">VS</span>
+              <span class="fighter-name fighter-name-linh">LINH <small>PHONG ẢNH</small></span>
+            </div>
+          </div>
+          <div class="hero-bottom">
+            <span class="hero-bottom-brand">HC / <b>01</b></span>
+            <span><b>02</b> VÕ SĨ <span class="mini-divide">/</span> <b>01</b> ĐẤU TRƯỜNG <span class="mini-divide">/</span> <b>60</b> FPS</span>
+            <span class="hero-hint">NHẤN <kbd>ENTER</kbd> ĐỂ BẮT ĐẦU</span>
+          </div>
+        </div>
+      </div>
       <div id="pauseOverlay" class="overlay hidden"><div class="inner-overlay"><p class="eyebrow">TẠM DỪNG</p><h2>PAUSE</h2><button id="resumeBtn" class="cta">TIẾP TỤC <span>→</span></button><p class="hint">Nhấn P để tiếp tục</p></div></div>
       <div id="resultOverlay" class="overlay hidden"><div class="inner-overlay"><p class="eyebrow">KẾT QUẢ TRẬN ĐẤU</p><h2 id="winnerText">MINH THẮNG!</h2><p id="winnerDetail" class="intro"></p><div class="menu-actions"><button id="rematchBtn" class="cta">TÁI ĐẤU <span>↻</span></button><button id="menuBtn" class="btn">MENU CHÍNH</button></div></div></div>
     </section>

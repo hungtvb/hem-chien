@@ -9,3 +9,40 @@
 .asset-status [data-state=ready]{color:#a1f7d4}
 .asset-status [hidden]{display:none!important}
 .menu-actions button:disabled{opacity:.45;cursor:wait;filter:grayscale(.45)}
+
+
+/* Premium arcade title screen, isolated from match HUD and existing combat UI */
+#startOverlay.menu-title-screen{display:block;padding:0;text-align:left;overflow:hidden;background:#070d1a url('assets/saigon-night.png') center/cover no-repeat;isolation:isolate}
+#startOverlay.menu-title-screen.hidden{display:none}
+#startOverlay.menu-title-screen::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,rgba(2,6,16,.89),rgba(3,7,19,.42) 54%,rgba(3,8,20,.13) 94%),linear-gradient(0deg,#050a17d9,transparent 20%,transparent 77%,#050a1799);box-shadow:inset 0 0 110px #02061399}
+#startOverlay.menu-title-screen::after{content:"";position:absolute;pointer-events:none;left:0;bottom:0;width:100%;height:3px;background:linear-gradient(90deg,#ff553e 0 35%,#e7e8e3 35% 42%,#49a7e5 42% 100%);box-shadow:0 0 24px #ea563955}
+.hero-frame{position:relative;display:flex;flex-direction:column;height:100%;width:100%;padding:2.7% 4.5% 2.35%;overflow:hidden}
+.hero-topbar,.hero-bottom{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-shrink:0}
+.hero-topbar{font-size:9px;font-weight:800;letter-spacing:2.1px;color:#dbd8d0b9}
+.hero-edition{display:flex;gap:13px;align-items:center}.edition-square{display:inline-block;width:7px;height:7px;background:#ff654a;box-shadow:0 0 18px #ff604c}.edition-line{height:1px;width:29px;background:#dadfd25c}
+.hero-build{border:1px solid #b8cee65d;padding:8px 11px;background:#0e1a2eaa;white-space:nowrap}.hero-build span{color:#ff9b80;margin-left:7px}
+.hero-main{flex:1;min-height:0;display:grid;grid-template-columns:54% 46%;align-items:center}
+.hero-copy{max-width:580px;padding-top:1%;position:relative;z-index:2}
+.hero-kicker{color:#fda58b;letter-spacing:3px;font-size:11px;font-weight:900;margin-bottom:12px;display:flex;align-items:center;gap:12px}.hero-kicker i{width:25px;height:3px;background:#fa6749;transform:skewX(-25deg)}
+.hero-logo{font-family:Impact,'Arial Black',sans-serif!important;font-style:italic!important;font-weight:900!important;font-size:clamp(75px,9.5vw,157px)!important;line-height:.81!important;letter-spacing:-2px!important;color:#fcf5e9!important;margin:9px 0 13px!important;text-transform:uppercase;transform:skewX(-5deg);filter:drop-shadow(3px 6px 0 #070b12)}
+.hero-logo>span,.hero-logo>em{display:block}.hero-logo>span{text-shadow:0 3px 2px #060a16,4px 6px 0 #4a2730}.hero-logo>em{font-style:inherit;color:#f05543!important;letter-spacing:-3px;text-shadow:3px 4px 0 #732625,6px 8px 0 #14131c}.logo-period{color:#f4ddbd}
+.hero-strike{width:158px;height:5px;transform:skewX(-28deg);background:linear-gradient(90deg,#ff563b,#e9935d 80%,transparent);margin:20px 0 16px}
+.hero-slogan{font:italic 900 clamp(15px,2vw,29px)/1.15 Impact,'Arial Black',sans-serif;letter-spacing:2.1px;color:#f8e8dc;margin:0 0 8px;text-shadow:0 2px 6px #000}
+.hero-description{font-size:clamp(10px,1.2vw,15px);line-height:1.55;color:#c0c7d1;letter-spacing:.25px;margin:0 0 27px}
+.hero-actions{display:flex;flex-direction:column;align-items:flex-start;gap:9px;max-width:360px}
+.hero-start{min-width:0!important;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;border:1px solid #ff947d!important;background:linear-gradient(120deg,#c82f2f,#f7603d 75%,#ff8f4e)!important;box-shadow:8px 10px 0 #07101e,0 0 30px #fe523525;transform:skewX(-6deg);padding:12px 17px!important;font-size:16px!important;letter-spacing:1px}
+.hero-start>*{transform:skewX(6deg)}.hero-start small{display:block;font-size:8px;letter-spacing:2.4px;color:#ffddd1;margin-top:3px}.hero-start strong{font-size:25px}.play-glyph{font-size:17px;color:#ffe6cf}
+.hero-start:focus-visible,.hero-training:focus-visible{outline:3px solid #fff;outline-offset:5px}
+.hero-training{width:100%;display:flex;align-items:center;gap:9px;justify-content:flex-start;background:#0a1526df!important;border:1px solid #46627e!important;color:#e1eaf5!important;letter-spacing:1.4px!important;padding:12px 15px!important}.hero-training>span:last-child{margin-left:auto;color:#67d0f5}.training-glyph{font-size:20px;color:#6abfe0}
+.hero-asset-status{margin:18px 0 0!important;max-width:355px!important;min-height:24px;border:none!important;background:none!important;padding:0!important;justify-content:flex-start!important;color:#c9d3da!important;font-size:10px!important;letter-spacing:.3px!important}
+.hero-asset-status #assetStatus:before{content:'●';font-size:9px;color:#f7b950;margin-right:7px}.hero-asset-status #assetStatus[data-state=ready]:before{color:#4eddb3}
+.hero-showcase{position:relative;align-self:stretch;pointer-events:none}
+.hero-showcase::before,.hero-showcase::after{content:"";position:absolute;display:block;pointer-events:none;background-repeat:no-repeat;background-size:cover;background-position:center;filter:saturate(1.15) contrast(1.06);-webkit-mask-image:radial-gradient(ellipse at 50% 46%,black 32%,#000e 47%,transparent 76%);mask-image:radial-gradient(ellipse at 50% 46%,black 32%,#000e 47%,transparent 76%)}
+.hero-showcase::before{width:88%;height:81%;top:6%;left:-12%;background-image:url('assets/portraits/minh.webp');transform:skewX(-8deg) rotate(-3deg)}
+.hero-showcase::after{width:82%;height:83%;top:2%;left:24%;background-image:url('assets/portraits/linh.webp');transform:skewX(-7deg) rotate(4deg)}
+.fighter-name{position:absolute;z-index:1;bottom:25%;font-family:Impact,'Arial Black',sans-serif;font-style:italic;font-size:clamp(20px,2.9vw,44px);line-height:1;letter-spacing:1.5px;text-shadow:2px 3px 8px #060b16}
+.fighter-name small{display:block;font:800 9px/2 'Segoe UI',sans-serif;letter-spacing:3px;color:#d5d8e4}.fighter-name-minh{left:13%;color:#ff745a}.fighter-name-linh{right:0;color:#72d5ff;text-align:right}.hero-versus{position:absolute;z-index:1;left:53%;bottom:27%;font:italic 900 32px Impact;color:#eae4de;text-shadow:0 0 25px #ffccac}
+.hero-bottom{border-top:1px solid #bbd6ec50;padding-top:14px;font:800 9px/1.5 'Segoe UI',sans-serif;letter-spacing:2px;color:#d0d7e2}.hero-bottom b{color:#f5f5f0}.hero-bottom-brand{font:900 17px Impact!important;letter-spacing:3px;color:#f6f7f3}.hero-bottom-brand b{color:#f35f4d}.mini-divide{color:#fd6849;margin:0 11px}.hero-hint kbd{margin-left:3px;background:#0b1b31aa;border:1px solid #6c7d91;color:#fff;font-size:10px}
+@media(max-width:900px){.hero-logo{font-size:clamp(68px,10vw,98px)!important}.hero-frame{padding:3% 4% 2.4%}.hero-main{grid-template-columns:57% 43%}.hero-copy{padding-top:7%}.hero-description{max-width:310px}.hero-edition{font-size:8px}.hero-build{font-size:8px}}
+@media(max-width:570px){.hero-edition .edition-line,.hero-bottom>span:nth-child(2){display:none}.hero-logo{font-size:clamp(53px,13vw,76px)!important}.hero-kicker{font-size:8px;letter-spacing:1px;margin-bottom:8px}.hero-slogan{font-size:14px}.hero-description{font-size:10px;max-width:230px;margin-bottom:16px}.hero-main{grid-template-columns:68% 32%}.hero-start{padding:7px 9px!important;font-size:10px!important}.hero-start small{font-size:7px}.hero-training{padding:7px 10px!important;font-size:9px!important}.fighter-name{font-size:15px;bottom:23%}.fighter-name small{font-size:7px;letter-spacing:1px}.hero-versus{font-size:17px;bottom:31%}.hero-asset-status{font-size:8px!important;margin-top:7px!important}.hero-bottom{font-size:8px;padding-top:8px}.hero-build{padding:5px;font-size:7px}.hero-frame{padding:3%}}
+@media(prefers-reduced-motion:reduce){.hero-start,.hero-training{transition:none!important}}
