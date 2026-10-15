@@ -1,0 +1,39 @@
+name: Alpha 1.0 Special Super Animation QA
+on:
+  push:
+    branches: [main, feat/alpha10-special-super]
+    paths:
+      - 'tools/build_special_frames.py'
+      - 'tools/test_alpha10.py'
+      - 'art-source/**'
+      - 'assets/sprites/artist/**'
+      - '.github/workflows/alpha10.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  special-super:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install sprite build dependencies
+        run: |
+          python -m pip install --disable-pip-version-check Pillow numpy opencv-python-headless playwright
+          python -m playwright install --with-deps chromium
+      - name: Rebuild Special and Super frames
+        run: |
+          python tools/build_special_frames.py
+          python tools/build_artist_atlas.py
+      - name: Verify sprite quality and gameplay E2E
+        run: |
+          python -m unittest discover -s tools -p 'test_artist_atlas.py' -v
+          python tools/test_alpha10.py
+          node --check game.js
+      - name: Check binary reproducibility
+        run: git diff --exit-code -- art-source assets/sprites/artist

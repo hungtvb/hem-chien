@@ -115,3 +115,11 @@ Bổ sung 32 frame LP/HP/LK/HK bằng biến dạng cutout từ master Alpha 0.7
 - See `docs/alpha09-defense-sprites.md` for limitations and pipeline.
 
 Production: https://hem-chien.vercel.app/
+
+## Alpha 1.0 — Special / Super cutout animation
+
+- Special and Super: 4 unique keyframes per pose for Minh and Linh; **24/24** artist overlay poses populated.
+- Color-coded red/orange energy for Minh and blue/cyan for Linh, with gameplay input/damage unchanged.
+- Reproduce with `python tools/build_special_frames.py && python tools/build_artist_atlas.py`.
+- E2E: `python tools/test_alpha10.py`; see `docs/alpha10-special-super.md`.
+- Art status: **concept-derived cutout animation; NOT independently hand-drawn HD**.
