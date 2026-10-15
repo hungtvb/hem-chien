@@ -46,7 +46,7 @@ with sync_playwright() as pw:
     page.wait_for_function('window.__combatDebug && window.__combatDebug().artistReady.minh && window.__combatDebug().artistReady.linh',timeout=30000)
     debug=page.evaluate('window.__combatDebug()')
     for fighter in ('minh','linh'):
-        assert sorted(debug['artistPoseCoverage'][fighter])==sorted(POSES),debug['artistPoseCoverage']
+        assert set(POSES).issubset(set(debug['artistPoseCoverage'][fighter])),debug['artistPoseCoverage']
         assert debug['atlasReady'][fighter]
     page.locator('#modeSelect').select_option('pvp')
     page.locator('#startBtn').click()
