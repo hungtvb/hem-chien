@@ -1,0 +1,34 @@
+name: Premium Title Screen E2E
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'styles.css'
+      - 'tools/test_menu.py'
+      - '.github/workflows/menu.yml'
+permissions:
+  contents: read
+jobs:
+  menu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Browser dependencies
+        run: |
+          python -m pip install --quiet playwright
+          python -m playwright install --with-deps chromium
+      - name: Menu render and interaction
+        run: python tools/test_menu.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: title-menu-preview
+          path: premium-title-preview.png
+          if-no-files-found: ignore
