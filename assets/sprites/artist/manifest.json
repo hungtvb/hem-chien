@@ -18,10 +18,14 @@
       "poses": [
         "idle",
         "walk",
+        "jump",
+        "crouch",
+        "block",
         "lp",
         "hp",
         "lk",
-        "hk"
+        "hk",
+        "hit"
       ],
       "atlas": "assets/sprites/artist/minh-overlay.png"
     },
@@ -29,10 +33,14 @@
       "poses": [
         "idle",
         "walk",
+        "jump",
+        "crouch",
+        "block",
         "lp",
         "hp",
         "lk",
-        "hk"
+        "hk",
+        "hit"
       ],
       "atlas": "assets/sprites/artist/linh-overlay.png"
     }
