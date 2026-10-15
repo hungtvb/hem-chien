@@ -1,0 +1,32 @@
+name: Cold-start Sprite Loading E2E
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - 'game.js'
+      - 'index.html'
+      - 'styles.css'
+      - 'vercel.json'
+      - 'tools/test_first_load.py'
+      - '.github/workflows/first-load.yml'
+permissions:
+  contents: read
+jobs:
+  test-cold-start:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Chromium
+        run: |
+          python -m pip install --disable-pip-version-check playwright
+          python -m playwright install --with-deps chromium
+      - name: Syntax check
+        run: node --check game.js
+      - name: First-load success and failure E2E
+        run: python tools/test_first_load.py

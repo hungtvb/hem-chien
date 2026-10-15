@@ -132,3 +132,10 @@ Production: https://hem-chien.vercel.app/
 - `window.__perfDebug()` cung cấp rolling metrics (180 frame gần nhất), slow frame count và animation transition state để debug.
 - E2E: `python tools/test_alpha11.py` kiểm tra visual transition, toggle B/M, tải asset, JavaScript errors. GitHub Actions lưu `alpha11-benchmark.json` và preview.
 - **Giới hạn:** đây là polish kỹ thuật; sprite hiện vẫn tạo từ concept cutout/deform, chưa được nghiệm thu hand-drawn HD hoàn chỉnh. FPS đo trên CI chỉ để so sánh, không phải bảo đảm 60 FPS trên mọi phần cứng.
+
+## Khắc phục hình nhân vật cũ khi vừa mở game
+- Production đợi atlas mới của cả Minh và Linh tải đầy đủ 12 pose trước khi cho vào trận.
+- Menu không tự vẽ nhân vật vector cũ trong lúc chờ.
+- Nếu atlas bị lỗi, nút Bắt đầu tạm khóa và hiển thị Tải lại, không âm thầm chuyển về art cũ.
+- Để kiểm tra: `window.__combatDebug().latestArtReady`. Bản offline vẫn có fallback.
+- Cache-Control revalidation cho asset với tên file cố định qua `vercel.json`.
