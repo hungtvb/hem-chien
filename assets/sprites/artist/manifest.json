@@ -25,6 +25,8 @@
         "hp",
         "lk",
         "hk",
+        "special",
+        "super",
         "hit"
       ],
       "atlas": "assets/sprites/artist/minh-overlay.png"
@@ -40,6 +42,8 @@
         "hp",
         "lk",
         "hk",
+        "special",
+        "super",
         "hit"
       ],
       "atlas": "assets/sprites/artist/linh-overlay.png"
