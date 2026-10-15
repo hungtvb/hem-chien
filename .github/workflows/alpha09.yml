@@ -1,0 +1,52 @@
+name: Alpha 0.9 Defense Sprite Build & E2E
+on:
+  push:
+    branches: [main, feat/alpha09-defense-movement]
+    paths:
+      - 'tools/build_defense_frames.py'
+      - 'tools/test_alpha09.py'
+      - 'art-source/**'
+      - 'assets/sprites/artist/**'
+      - '.github/workflows/alpha09.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  defense-sprites:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install frame tools & Chromium
+        run: |
+          python -m pip install --disable-pip-version-check Pillow numpy opencv-python-headless playwright
+          python -m playwright install --with-deps chromium
+      - name: Rebuild defensive frames and artist overlays
+        run: |
+          python tools/build_defense_frames.py
+          python tools/build_artist_atlas.py
+      - name: Validate attack, movement, collision and browser behavior
+        run: |
+          python -m unittest discover -s tools -p 'test_artist_atlas.py' -v
+          python tools/test_alpha08.py
+          python tools/test_alpha09.py
+          node --check game.js
+      - name: Ensure generated assets are reproducible on PR and main
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+        run: git diff --exit-code -- art-source assets/sprites/artist
+      - name: Publish generated alpha 0.9 art onto feature branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feat/alpha09-defense-movement'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add art-source/minh art-source/linh assets/sprites/artist
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "assets: bake Alpha 0.9 defense and movement keyframes"
+          git push origin HEAD:feat/alpha09-defense-movement

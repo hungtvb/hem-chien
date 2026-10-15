@@ -1,4 +1,4 @@
-# HẺM CHIẾN — Web PC Fighting Prototype Alpha 0.4 (combat + animation foundation)
+# HẺM CHIẾN — Web PC Fighting Prototype Alpha 0.9
 
 Prototype có thể chơi trên trình duyệt desktop, dùng **HTML5 Canvas + JavaScript thuần** để chạy offline, không phụ thuộc CDN. Đây là phiên bản kiểm chứng combat; hệ thống được thiết kế để có thể chuyển sang Phaser/TypeScript khi chốt vertical slice.
 
@@ -104,3 +104,14 @@ python3 tools/export_sprites.py
 ## Alpha 0.8 — Combat sprites
 
 Bổ sung 32 frame LP/HP/LK/HK bằng biến dạng cutout từ master Alpha 0.7; mỗi nhân vật có 6/12 pose overlay (idle, walk, lp, hp, lk, hk). Build lại với `python tools/build_attack_frames.py` và `python tools/build_artist_atlas.py`. Chi tiết và giới hạn artwork: [docs/alpha08-combat-sprites.md](docs/alpha08-combat-sprites.md). Đây chưa phải frame hand-drawn riêng lẻ.
+
+## Alpha 0.9 — Defense, Mobility & Hit Reaction Sprites
+
+- 32 concept-derived cutout keyframes: `jump`, `crouch`, `block`, `hit` for Minh and Linh, 4 PNG RGBA frames per state.
+- Combined concept sprite coverage: **20/24** poses. `special` and `super` deliberately retain the procedural fallback.
+- Rebuild via `python tools/build_defense_frames.py && python tools/build_artist_atlas.py`.
+- Test via `python tools/test_alpha09.py`; the existing attack E2E remains in regression CI.
+- Human art review is still required: these are **cutout/warped sprite prototypes**, NOT fully hand-drawn frame-by-frame animation.
+- See `docs/alpha09-defense-sprites.md` for limitations and pipeline.
+
+Production: https://hem-chien.vercel.app/
