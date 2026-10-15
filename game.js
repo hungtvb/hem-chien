@@ -28,6 +28,19 @@ const artistAtlases={minh:new Image(),linh:new Image()};
 const artistPoseSets={minh:new Set(),linh:new Set()};
 const artistAtlasReady={minh:false,linh:false};
 const artistManifest={status:'loading',error:null};
+const requireLatestArt=location.protocol==='http:'||location.protocol==='https:';
+function latestArtReady(){return ['minh','linh'].every(k=>artistAtlasReady[k]&&SPRITE_POSES.every(p=>artistPoseSets[k].has(p)));}
+function refreshArtGate(){
+ const label=$('assetStatus'),retry=$('assetRetry');if(!label||!retry)return;
+ if(!requireLatestArt){label.textContent='Bản offline: sử dụng sprite dự phòng khi cần.';return;}
+ const ready=latestArtReady(),failed=!!artistManifest.error;
+ $('startBtn').disabled=!ready;$('trainingBtn').disabled=!ready;
+ retry.hidden=!failed;
+ label.textContent=ready?'✓ Đã tải xong nhân vật mới — sẵn sàng chiến đấu.':
+ failed?'Không tải được sprite nhân vật mới. Hãy nhấn Tải lại.':
+ artistManifest.status==='loaded'?'Đang kiểm tra sprite mới...':'Đang tải nhân vật Minh và Linh...';
+ label.dataset.state=ready?'ready':failed?'error':'loading';
+}
 fetch('assets/sprites/artist/manifest.json').then(response=>{
  if(!response.ok)throw new Error(`HTTP ${response.status}`);
  return response.json();
@@ -45,13 +58,14 @@ fetch('assets/sprites/artist/manifest.json').then(response=>{
     artistPoseSets[kind]=new Set(poses);
     artistAtlasReady[kind]=true;
    }else artistManifest.error=`${kind}: atlas dimensions invalid`;
+   refreshArtGate();
   };
-  img.onerror=()=>{artistManifest.error=`${kind}: artist overlay did not load`;};
+  img.onerror=()=>{artistManifest.error=`${kind}: artist overlay did not load`;refreshArtGate();};
   // File name is hard-coded, never a user-supplied URL.
   img.src=`assets/sprites/artist/${kind}-overlay.png`;
  }
- artistManifest.status='loaded';
-}).catch(error=>{artistManifest.status='fallback';artistManifest.error=String(error);});
+ artistManifest.status='loaded';refreshArtGate();
+}).catch(error=>{artistManifest.status='fallback';artistManifest.error=String(error);refreshArtGate();});
 const portraits={minh:new Image(),linh:new Image()};
 for(const kind of ['minh','linh'])portraits[kind].src=`assets/portraits/${kind}.webp`;
 let afterimages=[],superCard=null,reduceMotion=false;
@@ -95,7 +109,8 @@ function handleActionInput(e){let id=e.code; if(e.repeat)return;if(id==='KeyH'){
 window.addEventListener('keydown',e=>{if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();keys.add(e.code);handleActionInput(e);});
 window.addEventListener('keyup',e=>keys.delete(e.code));
 window.addEventListener('blur',()=>keys.clear());
-function begin(t=false){mode=$('modeSelect').value;difficulty=$('difficultySelect').value;training=t;resetMatch();}
+function begin(t=false){if(requireLatestArt&&!latestArtReady()){refreshArtGate();return;}mode=$('modeSelect').value;difficulty=$('difficultySelect').value;training=t;resetMatch();}
+$('assetRetry').onclick=()=>location.reload();
 $('startBtn').onclick=()=>begin(false);$('trainingBtn').onclick=()=>begin(true);$('restartBtn').onclick=()=>begin(training);$('rematchBtn').onclick=()=>begin(training);$('resumeBtn').onclick=()=>{if(state==='paused'){state='fight';$('pauseOverlay').classList.add('hidden');}};
 $('menuBtn').onclick=()=>{state='menu';$('resultOverlay').classList.add('hidden');$('startOverlay').classList.remove('hidden');};
 $('modeSelect').onchange=e=>{mode=e.target.value;if(state==='fight'||state==='paused')begin(training);};
@@ -454,7 +469,7 @@ function drawPerfPanel(){
 }
 function draw(){ctx.save();if(shake>0){ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake*.7);}drawBackground();
  // sprite silhouettes, player in front with highlights
- drawAfterimages();drawFighter(p1);drawFighter(p2);drawCombatBoxes();drawFX();drawSuperCard();ctx.restore();hud();drawTrainingPanel();drawPerfPanel();
+ drawAfterimages();if(!requireLatestArt||latestArtReady()){drawFighter(p1);drawFighter(p2);}drawCombatBoxes();drawFX();drawSuperCard();ctx.restore();hud();drawTrainingPanel();drawPerfPanel();
  if(state==='menu'){// in-arcade background action preview
  } if(state==='paused'){ctx.fillStyle='#03081544';ctx.fillRect(0,0,W,H);}
 }
@@ -482,8 +497,8 @@ window.makeSpriteAtlas=function(kind='minh'){
  }
  return c.toDataURL('image/png');
 };
-window.__combatDebug=()=>({spriteRevision:'artist-overlay-v0.6',artistManifest:{...artistManifest},artistReady:{...artistAtlasReady},artistPoseCoverage:Object.fromEntries(Object.entries(artistPoseSets).map(([kind,poses])=>[kind,[...poses]])),showTrainingPanel,trainingStats,animationTimings:ANIM_TICKS,cancelConfirmed:{p1:p1.confirmed,p2:p2.confirmed},reduceMotion,portraitReady:Object.fromEntries(Object.entries(portraits).map(([k,img])=>[k,img.complete&&img.naturalWidth>0])),afterimages:afterimages.length,boxes:{p1:{hurt:hurtBoxes(p1),attack:attackBoxes(p1)},p2:{hurt:hurtBoxes(p2),attack:attackBoxes(p2)}},showCombatBoxes,preferAtlas,atlasReady:Object.fromEntries(Object.entries(spriteAtlases).map(([k,img])=>[k,img.complete&&img.naturalWidth===SPRITE_COLS*SPRITE_W&&img.naturalHeight===SPRITE_ROWS*SPRITE_H]))});
+window.__combatDebug=()=>({latestArtReady:latestArtReady(),requireLatestArt,spriteRevision:'artist-overlay-v0.6',artistManifest:{...artistManifest},artistReady:{...artistAtlasReady},artistPoseCoverage:Object.fromEntries(Object.entries(artistPoseSets).map(([kind,poses])=>[kind,[...poses]])),showTrainingPanel,trainingStats,animationTimings:ANIM_TICKS,cancelConfirmed:{p1:p1.confirmed,p2:p2.confirmed},reduceMotion,portraitReady:Object.fromEntries(Object.entries(portraits).map(([k,img])=>[k,img.complete&&img.naturalWidth>0])),afterimages:afterimages.length,boxes:{p1:{hurt:hurtBoxes(p1),attack:attackBoxes(p1)},p2:{hurt:hurtBoxes(p2),attack:attackBoxes(p2)}},showCombatBoxes,preferAtlas,atlasReady:Object.fromEntries(Object.entries(spriteAtlases).map(([k,img])=>[k,img.complete&&img.naturalWidth===SPRITE_COLS*SPRITE_W&&img.naturalHeight===SPRITE_ROWS*SPRITE_H]))});
 window.__perfDebug=()=>({...perfSnapshot(),visual:{minh:{...p1.visual},linh:{...p2.visual}},motionReduced:reduceMotion,profilerVisible:showPerfPanel});
 window.__gameDebug=()=>({state,round,timer,p1:{x:p1.x,hp:p1.hp,meter:p1.meter,action:p1.action},p2:{x:p2.x,hp:p2.hp,meter:p2.meter,action:p2.action},particles:particles.length,hitFreeze});
-resetMatch();state='menu';$('startOverlay').classList.remove('hidden');requestAnimationFrame(loop);
+resetMatch();state='menu';$('startOverlay').classList.remove('hidden');refreshArtGate();requestAnimationFrame(loop);
 })();
